@@ -2,6 +2,10 @@
 
 La responsable du support de Batifact a validé tes critères d’acceptation. Tu réalises un prototype d’assistant IA en ligne de commande qui répond aux questions de l’équipe à partir des fiches de procédure et rédige de nouvelles fiches, sans agir hors de leur dossier.
 
+> **En tant que** technicien du support Batifact en ligne avec un client, **je veux** poser la question du client à l’assistant, **afin de** suivre la bonne procédure sans chercher la fiche pendant que le client attend.
+
+> **En tant que** technicien du support, **je veux** faire préparer le brouillon d’une fiche manquante, **afin de** ne plus passer une demi-heure à la rédiger.
+
 ## Contenu du dépôt
 
 | Fichier | Rôle |
@@ -44,9 +48,23 @@ Le modèle choisit quoi lire et quoi écrire, mais une fiche ou une question peu
 
 ### 1. Accès
 
-Installe l’environnement et les dépendances, configure ta clé, complète `charger_configuration` dans `assistant/configuration.py`, vérifie un appel au service, puis décris l’installation dans la section [Ton assistant](#ton-assistant).
+L’assistant joint le service d’IA de l’entreprise avec ta clé, sans jamais la publier.
 
-**Résultat :** `python -m assistant --verifier` affiche la réponse du service ; sans clé ou sans adresse du service, un message explique quoi faire.
+1. Crée l’environnement virtuel et installe les dépendances.
+2. Configure ta clé dans `.env`.
+3. Complète `charger_configuration` dans `assistant/configuration.py`.
+4. Vérifie l’accès avec `python -m assistant --verifier`.
+5. Décris l’installation dans [Ton assistant](#ton-assistant).
+
+**Résultat :**
+
+> **Étant donné** une clé valide dans `.env`,<br>
+> **quand** tu lances `python -m assistant --verifier`,<br>
+> **alors** la réponse du service s’affiche.
+
+> **Étant donné** un `.env` sans clé ou sans adresse du service,<br>
+> **quand** tu lances l’assistant,<br>
+> **alors** un message explique quoi faire.
 
 Lance toujours l’assistant et les tests depuis la racine du dépôt, avec `python -m`. En cas de `ModuleNotFoundError`, voir l’[organisation du code](docs/organisation-du-code.md#erreurs-fréquentes).
 
@@ -83,9 +101,22 @@ Supprimer le fichier ne suffit pas : la clé reste dans l’historique. Préveni
 
 ### 2. Conversation
 
-L’assistant répond aux questions en gardant l’historique. Il signale une clé refusée ou un service qui ne répond pas, sans planter.
+Le technicien enchaîne les questions pendant un même appel, et une panne du service ne lui fait pas perdre l’assistant.
 
-**Résultat :** une deuxième question qui renvoie à la première obtient une réponse cohérente. Avec `SERVICE=simule`, les questions `panne`, `lent` et `refus` produisent chacune un message.
+1. Complète `poser` dans `assistant/conversation.py` : envoie la conversation au service et garde l’historique.
+2. Dans `assistant/client.py`, transforme chaque erreur du service en `ServiceIndisponible`.
+3. Dans `assistant/interface.py`, affiche ces erreurs sans quitter.
+4. Essaie avec `SERVICE=simule` les questions `panne`, `lent` et `refus`.
+
+**Résultat :**
+
+> **Étant donné** une première question posée à l’assistant,<br>
+> **quand** le technicien pose une deuxième question qui y renvoie,<br>
+> **alors** la réponse en tient compte.
+
+> **Étant donné** `SERVICE=simule` dans `.env`,<br>
+> **quand** le technicien pose la question `panne`, `lent` ou `refus`,<br>
+> **alors** un message explique le problème, et l’assistant accepte la question suivante.
 
 <details>
 <summary>Indice : historique</summary>
@@ -131,9 +162,28 @@ Le lire de bas en haut : la dernière ligne donne l’exception, la ligne au-des
 
 ### 3. Lecture
 
-L’utilisateur joint d’abord une fiche à sa question avec `/joindre`. Ensuite, le modèle lit lui-même une fiche grâce à l’outil `lire_fiche`. Dans [Ton assistant](#ton-assistant), compare les deux approches en quelques lignes.
+Le technicien joint lui-même une fiche à sa question, ou laisse l’assistant choisir la fiche à lire. Ce sont les lignes 2 et 3 du [scénario de démonstration](docs/scenario-demonstration.md) que tu présenteras vendredi.
 
-**Résultat :** une question sur la TVA obtient une réponse tirée de la fiche, et l’interface signale la lecture. Toute lecture hors du dossier des fiches est refusée, et tes tests de lecture (fiche du dossier, `..`, chemin absolu) réussissent avec `python -m pytest`.
+1. Complète `chemin_autorise` et `lire_fiche` dans `assistant/outils.py`, puis écris leurs tests (fiche du dossier, `..`, chemin absolu) jusqu’à ce que `python -m pytest` réussisse.
+2. Ajoute la commande `/joindre <fiche.md> <question>` et complète `joindre_fiche`. Essaie `/joindre facture-non-recue.md Résume cette fiche en trois lignes.`
+3. Complète `executer`, puis fais exécuter par `poser` les appels d’outil du modèle jusqu’à sa réponse finale. Essaie la question sur la TVA du scénario.
+4. Avec `SERVICE=simule`, vérifie les refus de ton programme : `/joindre ../.env.md Résume-la.` puis `lis ../.env.md`.
+5. Dans [Ton assistant](#ton-assistant), compare `/joindre` et `lire_fiche` en quelques lignes.
+
+> [!WARNING]
+> Tant que ces refus ne sont pas vérifiés, essaie toute lecture hors du dossier avec `SERVICE=simule` uniquement. Si ton contrôle laisse passer `.env`, son contenu part au service d’IA avec ta clé, et le formateur doit la révoquer.
+
+**Résultat :**
+
+> **Étant donné** que les fiches sont dans le dossier,<br>
+> **quand** le technicien demande : « Un client voit 20 % de TVA au lieu de 10 % sur une facture de rénovation, que faire ? »,<br>
+> **alors** l’interface signale la lecture, et la réponse reprend les étapes de `modifier-taux-tva.md` en citant son nom.
+
+> **Étant donné** `SERVICE=simule` dans `.env`,<br>
+> **quand** le technicien demande `lis ../.env.md`,<br>
+> **alors** un message indique que l’accès est refusé, et rien n’est lu.
+
+Tes tests de lecture réussissent avec `python -m pytest`.
 
 <details>
 <summary>Indice : appel d’outil</summary>
@@ -178,9 +228,32 @@ Voir [Get Started](https://docs.pytest.org/en/stable/getting-started.html), [pyt
 
 ### 4. Écriture
 
-Le modèle crée des fiches dans le dossier prévu et demande confirmation avant d’en écraser une. Le programme explique chaque refus et chaque arrêt dû à une limite.
+Le technicien fait rédiger le brouillon d’une fiche manquante, et aucune fiche existante n’est écrasée sans son accord. Les lignes 4 à 6 du [scénario de démonstration](docs/scenario-demonstration.md) que tu présenteras vendredi en donnent les demandes exactes.
 
-**Résultat :** une nouvelle fiche est créée sans confirmation. L’écrasement d’une fiche existante demande confirmation, et un refus la laisse intacte. La question `boucle` du service simulé s’arrête au nombre d’appels fixé, et la conversation continue. Tes tests de création et d’écrasement refusé réussissent.
+1. Décris l’outil `ecrire_fiche`, puis complète `ecrire_fiche` et `confirmer`. Écris les tests de création et d’écrasement refusé.
+2. Dans `poser`, arrête la question au-delà du nombre d’appels d’outil, et repars de zéro au-delà de la taille de conversation, chaque fois avec un message.
+3. Essaie avec `SERVICE=simule` : `écris <fiche.md>`, puis `boucle`.
+4. Pour essayer la taille de conversation, baisse `conversation_max_jetons` à 300 dans `limites.toml` et enchaîne quelques questions avec `SERVICE=simule`. Remets 60000 avant ton commit.
+
+**Résultat :**
+
+> **Étant donné** qu’aucune fiche `suspendre-compte.md` n’existe,<br>
+> **quand** le technicien demande de la rédiger,<br>
+> **alors** `fiches/suspendre-compte.md` est créée sans question.
+
+> **Étant donné** que `suspendre-compte.md` existe,<br>
+> **quand** le technicien demande de la modifier, puis refuse l’écrasement,<br>
+> **alors** un message indique le refus, et la fiche est inchangée.
+
+> **Étant donné** `SERVICE=simule` dans `.env`,<br>
+> **quand** le technicien pose la question `boucle`,<br>
+> **alors** la question s’arrête au nombre d’appels fixé avec un message, et l’assistant accepte la question suivante.
+
+> **Étant donné** `conversation_max_jetons = 300` et `SERVICE=simule`,<br>
+> **quand** le technicien enchaîne quelques questions,<br>
+> **alors** un message annonce que la conversation repart de zéro.
+
+Tes tests de création et d’écrasement refusé réussissent.
 
 <details>
 <summary>Indice : confirmation</summary>
@@ -194,13 +267,24 @@ C’est ton code qui demande la confirmation, pas le modèle. Voir [`Confirm.ask
 
 Compter les appels d’outil d’une même question. Pour la taille de la conversation, chaque réponse du service indique les jetons consommés dans `usage.total_tokens`.
 
+Pour la tester, fixer `limites["conversation_max_jetons"]` à une petite valeur dans le test, puis vérifier le message et la conversation qui repart de zéro.
+
 </details>
 
 ### 5. Tests et démonstration
 
-Complète tes tests avec le service simulé : conversation, appel d’outil, écriture par le modèle, arrêt au nombre d’appels, panne du service. Puis présente ton assistant à Nadia Ferrand, responsable du support, selon le [scénario de démonstration](docs/scenario-demonstration.md).
+Vendredi, tu présentes ton assistant à Nadia Ferrand, responsable du support, et tes tests montrent qu’il tient ses limites.
 
-**Résultat :** avec ceux des étapes 3 et 4, tes tests couvrent la lecture, le refus hors dossier, l’écriture, la confirmation, la conversation, l’arrêt au nombre d’appels et la panne du service, et réussissent tous.
+1. Complète tes tests avec le service simulé : conversation, appel d’outil, écriture par le modèle, arrêt au nombre d’appels, panne du service.
+2. Répète le [scénario de démonstration](docs/scenario-demonstration.md) sur un dépôt propre.
+
+**Résultat :**
+
+> **Étant donné** un dépôt propre,<br>
+> **quand** tu lances `python -m pytest`,<br>
+> **alors** tous les tests réussissent.
+
+Avec ceux des étapes 3 et 4, tes tests couvrent la lecture, le refus hors dossier, l’écriture, la confirmation, la conversation, l’arrêt au nombre d’appels et la panne du service.
 
 <details>
 <summary>Indice : tester avec le service simulé</summary>
