@@ -57,9 +57,8 @@ def lancer(verifier=False):
         question = saisie
         # À faire (étape 2) : afficher les erreurs du service sans quitter.
         # À faire (étape 3) : /joindre <fiche.md> <question> joint la fiche à la question.
-        # Affiche une animation pendant le bloc, et l’efface en sortant, même sur une exception.
-        with console.status("Le service réfléchit…"):
-            reponse = conversation.poser(
-                question, messages, service, configuration["modele"], limites, confirmer, signaler
-            )
+        signaler("Le service réfléchit…")
+        reponse = conversation.poser(
+            question, messages, service, configuration["modele"], limites, confirmer, signaler
+        )
         console.print(Markdown(reponse))
