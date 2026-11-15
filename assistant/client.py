@@ -2,6 +2,7 @@
 
 import openai
 
+from assistant.configuration import ConfigurationInvalide
 from assistant.service_simule import ServiceSimule
 
 
@@ -13,6 +14,9 @@ def creer_client(configuration, limites):
     """Renvoie le client du service choisi dans la configuration."""
     if configuration["service"] == "simule":
         return ServiceSimule()
+    # Sans adresse, le SDK enverrait la clé à OpenAI : refuser avant tout appel.
+    if not configuration.get("url"):
+        raise ConfigurationInvalide("Adresse du service absente : vérifie LITELLM_BASE_URL dans .env et ce que renvoie charger_configuration.")
     # Arguments nommés (nom=valeur) : chacun désigne son paramètre, dans n’importe quel ordre.
     return openai.OpenAI(
         base_url=configuration["url"],
