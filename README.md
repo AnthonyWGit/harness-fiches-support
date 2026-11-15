@@ -24,7 +24,7 @@ La responsable du support de Batifact a validé tes critères d’acceptation. T
    - **base :** `rendu/<prenom>`, ta branche ;
    - **head repository :** `<ton-compte>/harness-fiches-support` ;
    - **compare :** `main`.
-2. Lis le [schéma du cadre technique](docs/schema-cadre-technique.md) et l’[organisation du code](docs/organisation-du-code.md), puis parcours le code de départ.
+2. Lis le [schéma du cadre technique](docs/schema-cadre-technique.md) et l’[organisation du code](docs/organisation-du-code.md), puis parcours le code de départ. Une erreur `NotImplementedError: Étape n : …` signale une fonction qu’il reste à écrire à l’étape n.
 3. Termine chaque étape par un commit et un push.
 
 ## Limites fixées par l’équipe
@@ -44,9 +44,9 @@ Le modèle choisit quoi lire et quoi écrire, mais une fiche ou une question peu
 
 ### 1. Accès
 
-Installe l’environnement et les dépendances, configure ta clé, vérifie un appel au service, puis décris l’installation dans la section [Ton assistant](#ton-assistant).
+Installe l’environnement et les dépendances, configure ta clé, complète `charger_configuration` dans `assistant/configuration.py`, vérifie un appel au service, puis décris l’installation dans la section [Ton assistant](#ton-assistant).
 
-**Résultat :** `python -m assistant --verifier` affiche la réponse du service ; sans clé, un message explique quoi faire.
+**Résultat :** `python -m assistant --verifier` affiche la réponse du service ; sans clé ou sans adresse du service, un message explique quoi faire.
 
 Lance toujours l’assistant et les tests depuis la racine du dépôt, avec `python -m`. En cas de `ModuleNotFoundError`, voir l’[organisation du code](docs/organisation-du-code.md#erreurs-fréquentes).
 
