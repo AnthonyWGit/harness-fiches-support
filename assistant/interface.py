@@ -30,11 +30,11 @@ def lancer(verifier=False):
     """Démarre l’assistant et renvoie le code de sortie du programme."""
     try:
         configuration = charger_configuration()
+        limites = charger_limites()
+        service = client.creer_client(configuration, limites)
     except ConfigurationInvalide as erreur:  # erreur : l’exception levée ; l’afficher donne son message
         console.print(f"Erreur : {erreur}")
         return 1
-    limites = charger_limites()
-    service = client.creer_client(configuration, limites)
     if verifier:
         console.print(client.verifier_acces(service, configuration["modele"]))
         return 0
