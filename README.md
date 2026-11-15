@@ -2,6 +2,8 @@
 
 La responsable du support de Batifact a validé tes critères d’acceptation. Tu réalises un prototype d’assistant IA en ligne de commande qui répond aux questions de l’équipe à partir des fiches de procédure et rédige de nouvelles fiches, sans agir hors de leur dossier.
 
+Ton prototype répond à ces deux user stories (US) :
+
 > **En tant que** technicien du support Batifact en ligne avec un client, **je veux** poser la question du client à l’assistant, **afin de** suivre la bonne procédure sans chercher la fiche pendant que le client attend.
 
 > **En tant que** technicien du support, **je veux** faire préparer le brouillon d’une fiche manquante, **afin de** ne plus passer une demi-heure à la rédiger.
