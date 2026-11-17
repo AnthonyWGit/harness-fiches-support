@@ -26,12 +26,28 @@ def joindre_fiche(nom, question, limites):
 
 
 def poser(question, messages, service, modele, limites, confirmer, signaler):
-    """Ajoute la question aux messages, exécute les appels d’outil et renvoie la réponse du modèle.
+    """Ajoute la question aux messages, envoie la conversation et garde l'historique.
 
-    confirmer(nom) renvoie True si l’utilisateur accepte d’écraser la fiche ;
-    signaler(texte) affiche une opération ou un refus à l’utilisateur.
+    confirmer et signaler seront utilisés aux étapes 3 et 4.
     """
-    # À faire (étape 2) : envoyer la conversation avec client.envoyer et garder l’historique.
-    # À faire (étape 3) : exécuter les appels d’outil du modèle jusqu’à sa réponse finale.
-    # À faire (étape 4) : arrêter la question au-delà des limites.
-    raise NotImplementedError("Étape 2 : poser")
+    messages.append({"role": "user", "content": question})
+
+    try:
+        reponse = client.envoyer(service, modele, messages)
+    except client.ServiceIndisponible:
+        # On retire la question pour garder un historique cohérent, puis on propage.
+        # En d'autres mots : nettoyer l'historique pour qu'il reste cohérent puis on laisse
+        # l'interface gérer l'affichage de l'erreur
+        messages.pop()
+        raise
+
+    message = reponse.choices[0].message
+
+    # À faire (étape 3) : si message.tool_calls, exécuter les outils jusqu'à la réponse finale.
+    # À faire (étape 4) : gérer les limites (appels d'outil, taille de conversation).
+    if getattr(message, "tool_calls", None):
+        messages.append(message.model_dump(exclude_none=True))
+        return "Fonctionnalité à venir (étape 3) : exécution des outils."
+
+    messages.append({"role": "assistant", "content": message.content})
+    return message.content
