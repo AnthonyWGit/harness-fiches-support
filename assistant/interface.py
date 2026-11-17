@@ -4,7 +4,7 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.prompt import Prompt
 
-from assistant import client, conversation
+from assistant import client, conversation, outils
 from assistant.configuration import ConfigurationInvalide, charger_configuration, charger_limites
 
 AIDE = """Pose ta question, puis valide avec Entrée.
@@ -56,6 +56,15 @@ def lancer(verifier=False):
             continue
         question = saisie
         # À faire (étape 2) : afficher les erreurs du service sans quitter.
+        signaler("Le service réfléchit…")
+        try:
+            reponse = conversation.poser(
+                question, messages, service, configuration["modele"], limites, confirmer, signaler
+            )
+        except client.ServiceIndisponible as erreur:
+            console.print(f"[red]Erreur : {erreur}[/red]")
+            continue
+        console.print(Markdown(reponse))
         # À faire (étape 3) : /joindre <fiche.md> <question> joint la fiche à la question.
         signaler("Le service réfléchit…")
         reponse = conversation.poser(
