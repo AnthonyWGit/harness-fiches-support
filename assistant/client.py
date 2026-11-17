@@ -34,6 +34,8 @@ def envoyer(client, modele, messages, outils=None):
                 model=modele, messages=messages, tools=outils
             )
         else:
+            # Le module Openai chargé au début du document permet d'accéder aux méthodes chat completions create
+            # Cet appel fonctionne avec LiteLLM qui route vers plusieurs modèles
             reponse = client.chat.completions.create(model=modele, messages=messages)
         return reponse
     except Exception as erreur:  # toute panne du service devient ServiceIndisponible
