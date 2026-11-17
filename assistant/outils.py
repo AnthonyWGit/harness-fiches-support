@@ -31,16 +31,31 @@ def lister_fiches(limites):
 
 def chemin_autorise(nom, limites):
     """Renvoie le chemin de la fiche si elle reste dans le dossier des fiches, sinon lève AccesRefuse."""
-    # À faire (étape 3) : refuser tout chemin hors du dossier, y compris par .., chemin absolu
-    # ou lien symbolique, et toute autre extension que celle des limites.
-    raise NotImplementedError("Étape 3 : chemin_autorise")
+    if not isinstance(nom, str) or not nom.strip():
+        raise AccesRefuse("Nom de fiche invalide.")
+    chemin = Path(nom)
+    #Chemin absolu = à la racine du systeme donc hors du dossier de travail
+    # .. renvoie au dossier parent donc même remarque
+    if chemin.is_absolute() or ".." in chemin.parts:
+        raise AccesRefuse("Accès refusé : chemin hors du dossier des fiches.")
+    #vérifier l'extension
+    if chemin.suffix != limites["extension"]:
+        raise AccesRefuse(
+            f"Accès refusé : seule l'extension {limites['extension']} est autorisée."
+        )
+    dossier = Path(limites["dossier_fiches"]).resolve()
+    cible = (dossier / chemin).resolve()
+    if not cible.is_relative_to(dossier):
+        raise AccesRefuse("Accès refusé : chemin hors du dossier des fiches.")
+    return cible
 
 
 def lire_fiche(nom, limites):
     """Renvoie le contenu de la fiche, ou lève AccesRefuse."""
     # À faire (étape 3) : contrôler le chemin et la taille, puis lire la fiche.
-    raise NotImplementedError("Étape 3 : lire_fiche")
-
+    chemin = chemin_autorise(nom,limites)
+    with open(chemin, "r", encoding="utf-8") as fiche:
+        return fiche.read()
 
 def ecrire_fiche(nom, contenu, limites, confirmer):
     """Enregistre la fiche ; confirmer(nom) décide d’un écrasement. Lève AccesRefuse sinon."""
