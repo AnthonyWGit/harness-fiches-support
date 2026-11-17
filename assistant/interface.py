@@ -65,7 +65,7 @@ def lancer(verifier=False):
             console.print(f"[red]Erreur : {erreur}[/red]")
             continue
         # À faire (étape 3) : /joindre <fiche.md> <question> joint la fiche à la question.
-        reponse = conversation.poser(
-            question, messages, service, configuration["modele"], limites, confirmer, signaler
-        )
+        # reponse = conversation.poser(
+        #     question, messages, service, configuration["modele"], limites, confirmer, signaler
+        # )
         console.print(Markdown(reponse))
