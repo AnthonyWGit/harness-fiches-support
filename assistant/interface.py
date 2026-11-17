@@ -64,9 +64,7 @@ def lancer(verifier=False):
         except client.ServiceIndisponible as erreur:
             console.print(f"[red]Erreur : {erreur}[/red]")
             continue
-        console.print(Markdown(reponse))
         # À faire (étape 3) : /joindre <fiche.md> <question> joint la fiche à la question.
-        signaler("Le service réfléchit…")
         reponse = conversation.poser(
             question, messages, service, configuration["modele"], limites, confirmer, signaler
         )
