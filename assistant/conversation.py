@@ -39,6 +39,9 @@ def poser(question, messages, service, modele, limites, confirmer, signaler):
         # En d'autres mots : nettoyer l'historique pour qu'il reste cohérent puis on laisse
         # l'interface gérer l'affichage de l'erreur
         messages.pop()
+        # Un raise tout seul DANS UN EXCEPT relance exactement l'erreur en cours de traitement
+        # avec type/message/traces d'exec. intact
+        # Un raise seul conserve le tout : on ne pert pas les messages ni les traces
         raise
 
     message = reponse.choices[0].message
