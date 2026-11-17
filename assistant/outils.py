@@ -1,5 +1,5 @@
 """Outils proposés au modèle : lire et écrire une fiche, dans les limites fixées."""
-
+import json
 from pathlib import Path
 
 DEFINITIONS = [
@@ -66,5 +66,19 @@ def ecrire_fiche(nom, contenu, limites, confirmer):
 def executer(appel, limites, confirmer):
     """Exécute un appel d’outil du modèle et renvoie le texte de son résultat, ou lève AccesRefuse."""
     # À faire (étape 3) : lire les arguments JSON de appel.function.arguments,
-    # puis lancer l’outil nommé appel.function.name ; tout appel invalide est refusé.
-    raise NotImplementedError("Étape 3 : executer")
+    # puis lancer l’outil nommé appel.function.name ; tout appel invalide est refusé. 
+    try:
+        arguments = json.loads(appel.function.arguments)
+    except (json.JSONDecodeError, TypeError):
+        raise AccesRefuse("Arguments invalides pour l'outil.")
+    nom = appel.function.name
+    if nom == "lire_fiche":
+        nom = arguments.get("nom")
+        if not nom_fichier:
+            raise AccesRefuse("Argument 'nom' manquant pour lire fiche")
+        return lire_fiche(arguments.get("nom"), limites)
+
+    # if appel.function.name == "ecrire_fiche":
+    #     user_input = input()
+    #     ecrire_fiche(appel,user_input,limites)
+
