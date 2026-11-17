@@ -28,13 +28,19 @@ def creer_client(configuration, limites):
 
 def envoyer(client, modele, messages, outils=None):
     """Envoie les messages au service et renvoie sa réponse, ou lève ServiceIndisponible."""
-    # À faire (étape 2) : transformer chaque erreur du service en ServiceIndisponible,
-    # avec un message qui dit à l’utilisateur ce qui se passe et quoi faire.
-    if outils:
-        reponse = client.chat.completions.create(model=modele, messages=messages, tools=outils)
-    else:
-        reponse = client.chat.completions.create(model=modele, messages=messages)
-    return reponse
+    try:
+        if outils:
+            reponse = client.chat.completions.create(
+                model=modele, messages=messages, tools=outils
+            )
+        else:
+            reponse = client.chat.completions.create(model=modele, messages=messages)
+        return reponse
+    except Exception as erreur:  # toute panne du service devient ServiceIndisponible
+        raise ServiceIndisponible(
+            f"Service d'IA indisponible : {erreur}. "
+            "Vérifie la clé, l'adresse et le réseau, puis réessaie."
+        )
 
 
 def verifier_acces(client, modele):
