@@ -35,14 +35,14 @@ def charger_configuration():
     modele = os.getenv("MODELE")
     if not url:
         raise ConfigurationInvalide(
-            "Adresse du service absente : renseigne LITELLM_BASE_URL dans .env."
+            "Adresse du service absente : renseignez LITELLM_BASE_URL dans .env."
         )
     if not cle_api:
         raise ConfigurationInvalide(
-            "Clé absente : renseigne LITELLM_API_KEY dans .env (ne la versionne jamais)."
+            "Clé absente : renseignez LITELLM_API_KEY dans .env (ne la versionne jamais)."
         )
     if not modele:
         raise ConfigurationInvalide(
-            "Modèle absent : renseigne MODELE dans .env (ex. gpt-luna)."
+            "Modèle absent : renseignez MODELE dans .env (ex. gpt-luna)."
         )
     return {"service": "litellm", "url": url, "cle": cle_api, "modele": modele}
