@@ -87,3 +87,21 @@ def test_injoignable(limites):
         conversation.poser(
             "panne", messages, service, "simule", limites, refuser, ignorer
         )
+
+def test_non_authentifie(limites):
+    service = ServiceSimule([cle_refusee()])
+    messages = conversation.nouvelle_conversation(limites)
+
+    with pytest.raises(client.ServiceIndisponible):
+        conversation.poser(
+            "refus", messages, service, "simule", limites, refuser, ignorer
+        )
+
+def test_timeout(limites):
+    service = ServiceSimule([delai_depasse()])
+    messages = conversation.nouvelle_conversation(limites)
+
+    with pytest.raises(client.ServiceIndisponible):
+        conversation.poser(
+            "lent", messages, service, "simule", limites, refuser, ignorer
+        )
