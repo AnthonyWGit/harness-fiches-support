@@ -71,8 +71,8 @@ def executer(appel, limites, confirmer):
         arguments = json.loads(appel.function.arguments)
     except (json.JSONDecodeError, TypeError):
         raise AccesRefuse("Arguments invalides pour l'outil.")
-    nom = appel.function.name
-    if nom == "lire_fiche":
+    nom_outil = appel.function.name
+    if nom_outil == "lire_fiche":
         nom = arguments.get("nom")
         if not nom :
             raise AccesRefuse("Argument 'nom' manquant pour lire fiche")
