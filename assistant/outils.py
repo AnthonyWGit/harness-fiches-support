@@ -73,22 +73,24 @@ def ecrire_fiche(nom, contenu, limites, confirmer):
     raise NotImplementedError("Étape 4 : ecrire_fiche")
 
 
-def executer(appel, limites, confirmer):
+def executer(appel, limites):
     """Exécute un appel d’outil du modèle et renvoie le texte de son résultat, ou lève AccesRefuse."""
-    # À faire (étape 3) : lire les arguments JSON de appel.function.arguments,
-    # puis lancer l’outil nommé appel.function.name ; tout appel invalide est refusé. 
+    #Renvoie un dicto qui contient des arguments
     try:
         arguments = json.loads(appel.function.arguments)
     except (json.JSONDecodeError, TypeError):
         raise AccesRefuse("Arguments invalides pour l'outil.")
+    #On se sert du fait que json.loads retourne un dico pour vérifier 
+    #qu'on a bien ce que l'on veut (ex. '{"nom": "fiche.md"}')
+    if not isinstance(arguments, dict):
+        raise AccesRefuse("Arguments invalides pour l'outil.")
     nom_outil = appel.function.name
     if nom_outil == "lire_fiche":
-        nom = arguments.get("nom")
-        if not nom :
+        nom_fiche = arguments.get("nom")
+        if not isinstance(nom_fiche, str) or not nom_fiche.strip():
             raise AccesRefuse("Argument 'nom' manquant pour lire fiche")
-        return lire_fiche(arguments.get("nom"), limites)
-
-    # if appel.function.name == "ecrire_fiche":
-    #     user_input = input()
-    #     ecrire_fiche(appel,user_input,limites)
-
+        return lire_fiche(nom_fiche, limites)
+    if nom_outil == "ecrire_fiche":
+        raise AccesRefuse("Écriture non implémentée (étape 4).")
+    #Cas où il n'y a pas d'outils correspondant
+    raise AccesRefuse(f"Outil inconnu : {nom_outil}")
