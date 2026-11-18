@@ -74,7 +74,7 @@ def executer(appel, limites, confirmer):
     nom = appel.function.name
     if nom == "lire_fiche":
         nom = arguments.get("nom")
-        if not nom_fichier:
+        if not nom :
             raise AccesRefuse("Argument 'nom' manquant pour lire fiche")
         return lire_fiche(arguments.get("nom"), limites)
 
