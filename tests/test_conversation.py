@@ -1,7 +1,8 @@
-
+import pytest
 from assistant import conversation
-from assistant.service_simule import ServiceSimule, texte
-
+from assistant.service_simule import ServiceSimule, texte, panne, delai_depasse, cle_refusee
+from assistant.client import ServiceIndisponible
+from assistant.outils import AccesRefuse
 
 def refuser(nom):
     """Refuse tout écrasement de fiche."""
@@ -77,4 +78,12 @@ def test_garde_l_historique(limites):
     for question, reponse_attendue in echanges:
         assert reponses[i] == reponse_attendue
         i = i + 1
-    
+
+def test_injoignable(limites):
+    service = ServiceSimule([panne()])
+    messages = conversation.nouvelle_conversation(limites)
+
+    with pytest.raises(client.ServiceIndisponible):
+        conversation.poser(
+            "panne", messages, service, "simule", limites, refuser, ignorer
+        )
