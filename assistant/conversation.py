@@ -32,25 +32,37 @@ def poser(question, messages, service, modele, limites, confirmer, signaler):
     """
     messages.append({"role": "user", "content": question})
 
-    try:
-        reponse = client.envoyer(service, modele, messages)
-    except client.ServiceIndisponible:
-        # On retire la question pour garder un historique cohérent, puis on propage.
-        # En d'autres mots : nettoyer l'historique pour qu'il reste cohérent puis on laisse
-        # l'interface gérer l'affichage de l'erreur
-        messages.pop()
-        # Un raise tout seul DANS UN EXCEPT relance exactement l'erreur en cours de traitement
-        # avec type/message/traces d'exec. intact
-        # Un raise seul conserve le tout : on ne pert pas les messages ni les traces
-        raise
+    while True:
+        try:
+            reponse = client.envoyer(service, modele, messages, outils=outils.DEFINITIONS)
+        except client.ServiceIndisponible:
+            # On retire la question pour garder un historique cohérent, puis on propage.
+            # En d'autres mots : nettoyer l'historique pour qu'il reste cohérent puis on laisse
+            # l'interface gérer l'affichage de l'erreur
+            messages.pop()
+            # Un raise tout seul DANS UN EXCEPT relance exactement l'erreur en cours de traitement
+            # avec type/message/traces d'exec. intact
+            # Un raise seul conserve le tout : on ne pert pas les messages ni les traces
+            raise
+        message = reponse.choices[0].message
+        # À faire (étape 3) : si message.tool_calls, exécuter les outils jusqu'à la réponse finale.
+        if getattr(message, "tool_calls", None):
+            messages.append(message.model_dump(exclude_none=True))
+            for appel in message.tool_calls:
+                signaler(f"Outil : {appel.function.name}")
+                try:
+                    resultat = outils.executer(appel, limites, confirmer)
+                except outils.AccesRefuse as erreur:
+                    resultat = str(erreur)
+                    signaler(str(erreur))
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": appel.id,
+                    "content": resultat,
+                })
+            # On reboucle pour envoyer les résultats au modèle.
+            continue
 
-    message = reponse.choices[0].message
-
-    # À faire (étape 3) : si message.tool_calls, exécuter les outils jusqu'à la réponse finale.
-    # À faire (étape 4) : gérer les limites (appels d'outil, taille de conversation).
-    if getattr(message, "tool_calls", None):
-        messages.append(message.model_dump(exclude_none=True))
-        return "Fonctionnalité à venir (étape 3) : exécution des outils."
-
-    messages.append({"role": "assistant", "content": message.content})
-    return message.content
+        # À faire (étape 4) : gérer les limites (appels d'outil, taille de conversation).
+        messages.append({"role": "assistant", "content": message.content})
+        return message.content
