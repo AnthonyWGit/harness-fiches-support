@@ -16,12 +16,13 @@ def ignorer(texte):
 
 def test_renvoie_la_reponse_du_modele(limites):
     # Le service simulé renverra ce texte, puis s'arrêtera.
-    service = ServiceSimule([texte("Bonjour, que puis-je faire ?")])
+    service = ServiceSimule([texte("Hello world")])
 
     messages = conversation.nouvelle_conversation(limites)
     reponse = conversation.poser(
-        "Bonjour", messages, service, "simule", limites, refuser, ignorer
+        "World", messages, service, "simule", limites, refuser, ignorer
     )
+    assert reponse == "Hello world"
 
 def test_garde_l_historique(limites):
     # /!\ Ce sont des tuples : couple 1-question 2- réponse du service simulé /!\
@@ -69,7 +70,6 @@ def test_garde_l_historique(limites):
     for question, reponse in echanges:
         assert any(question in c for c in contenus), f"Question absente : {question}"
 
-
     # --- ÉTAPE 5 : comparer réponse réelle vs réponse attendue ---
     # reponses[i]       = ce que poser a renvoyé (réponse réelle)
     # reponse_attendue  = le 2ᵉ élément du tuple (réponse simulée attendue)
@@ -83,7 +83,7 @@ def test_injoignable(limites):
     service = ServiceSimule([panne()])
     messages = conversation.nouvelle_conversation(limites)
 
-    with pytest.raises(client.ServiceIndisponible):
+    with pytest.raises(ServiceIndisponible):
         conversation.poser(
             "panne", messages, service, "simule", limites, refuser, ignorer
         )
@@ -92,7 +92,7 @@ def test_non_authentifie(limites):
     service = ServiceSimule([cle_refusee()])
     messages = conversation.nouvelle_conversation(limites)
 
-    with pytest.raises(client.ServiceIndisponible):
+    with pytest.raises(ServiceIndisponible):
         conversation.poser(
             "refus", messages, service, "simule", limites, refuser, ignorer
         )
@@ -101,7 +101,37 @@ def test_timeout(limites):
     service = ServiceSimule([delai_depasse()])
     messages = conversation.nouvelle_conversation(limites)
 
-    with pytest.raises(client.ServiceIndisponible):
+    with pytest.raises(ServiceIndisponible):
         conversation.poser(
             "lent", messages, service, "simule", limites, refuser, ignorer
         )
+
+def test_injoignable_message(limites):
+    service = ServiceSimule([panne()])
+    messages = conversation.nouvelle_conversation(limites)
+
+    with pytest.raises(ServiceIndisponible) as erreur:
+        conversation.poser(
+            "panne", messages, service, "simule", limites, refuser, ignorer
+        )
+    assert "Service IA injoignable, problème de connexion" in str(erreur.value)
+
+def test_cle_api_message(limites):
+    service = ServiceSimule([cle_refusee()])
+    messages = conversation.nouvelle_conversation(limites)
+
+    with pytest.raises(ServiceIndisponible) as erreur:
+        conversation.poser(
+            "panne", messages, service, "simule", limites, refuser, ignorer
+        )
+    assert "Erreur d'authentification clé API" in str(erreur.value)
+
+def test_timeout_message(limites):
+    service = ServiceSimule([delai_depasse()])
+    messages = conversation.nouvelle_conversation(limites)
+
+    with pytest.raises(ServiceIndisponible) as erreur:
+        conversation.poser(
+            "panne", messages, service, "simule", limites, refuser, ignorer
+        )
+    assert "Erreur délai dépassé" in str(erreur.value)
