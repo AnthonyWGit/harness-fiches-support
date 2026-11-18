@@ -14,7 +14,6 @@ AIDE = """Pose ta question, puis valide avec Entrée.
 
 console = Console()
 
-
 def confirmer(nom):
     """Demande à l’utilisateur s’il accepte d’écraser la fiche."""
     # À faire (étape 4).
@@ -55,19 +54,9 @@ def lancer(verifier=False):
         if not saisie:
             continue
         question = saisie
-        # À faire (étape 2) : afficher les erreurs du service sans quitter.
-        signaler("Le service réfléchit…")
-        try:
-            reponse = conversation.poser(
-                question, messages, service, configuration["modele"], limites, confirmer, signaler
-            )
-        except client.ServiceIndisponible as erreur:
-            console.print(f"[red]Erreur : {erreur}[/red]")
-            continue
-        # À faire (étape 3) : /joindre <fiche.md> <question> joint la fiche à la question.
-        # Split() coupe sur les espaces 
-        parties = saisie.split(maxsplit=2) # /joindre plus nom-de-fiche
-        if parties[0] == "/joindre": 
+        # Split() coupe sur les espaces
+        parties = saisie.split(maxsplit=2)  # /joindre plus nom-de-fiche
+        if parties and parties[0] == "/joindre":
             if len(parties) < 3:
                 signaler("Usage : /joindre <fiche.md> <question>")
                 continue
@@ -78,9 +67,10 @@ def lancer(verifier=False):
             except outils.AccesRefuse as erreur:
                 signaler(str(erreur))
                 continue
+        # À faire (étape 2) : afficher les erreurs du service sans quitter.
         signaler("Le service réfléchit…")
-        #try/catch pour ne pas que l'app plante
-        #Utile pour helpdesk pour avoir de soucis pendant intervention
+        # try/catch pour ne pas que l'app plante
+        # Utile pour helpdesk pour avoir de soucis pendant intervention
         try:
             reponse = conversation.poser(
                 question, messages, service, configuration["modele"], limites, confirmer, signaler
