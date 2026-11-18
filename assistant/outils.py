@@ -1,5 +1,6 @@
 """Outils proposés au modèle : lire et écrire une fiche, dans les limites fixées."""
 import json
+import os
 from pathlib import Path
 
 DEFINITIONS = [
@@ -54,8 +55,17 @@ def lire_fiche(nom, limites):
     """Renvoie le contenu de la fiche, ou lève AccesRefuse."""
     # À faire (étape 3) : contrôler le chemin et la taille, puis lire la fiche.
     chemin = chemin_autorise(nom,limites)
-    with open(chemin, "r", encoding="utf-8") as fiche:
-        return fiche.read()
+    # Passage en octets : 1ko = 1024 octets 
+    taille_max = limites["taille_max_koo"] * 1024
+    if chemin.stat().st_size > taille_max:
+        raise AccesRefuse("Fichier trop lourd")
+    try:    
+        with open(chemin, "r", encoding="utf-8") as fiche:
+            return fiche.read()
+    except OSError as e:
+        raise AccesRefuse("Erreur dans la lecture du fichier")
+
+        
 
 def ecrire_fiche(nom, contenu, limites, confirmer):
     """Enregistre la fiche ; confirmer(nom) décide d’un écrasement. Lève AccesRefuse sinon."""
