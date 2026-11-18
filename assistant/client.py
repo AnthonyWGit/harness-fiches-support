@@ -38,11 +38,18 @@ def envoyer(client, modele, messages, outils=None):
             # Cet appel fonctionne avec LiteLLM qui route vers plusieurs modèles
             reponse = client.chat.completions.create(model=modele, messages=messages)
         return reponse
-    except Exception as erreur:  # toute panne du service devient ServiceIndisponible
-        raise ServiceIndisponible(
-            f"Service d'IA indisponible : {erreur}. "
-            "Vérifie la clé, l'adresse et le réseau, puis réessaie."
-        )
+    except openai.APITimeoutError :
+        raise ServiceIndisponible("Erreur délai dépassé")    
+    except openai.APIConnectionError :
+        raise ServiceIndisponible("Service IA injoignable, problème de connexion")
+    except openai.AuthenticationError :  
+        raise ServiceIndisponible("Erreur d'authentification clé API")
+    except openai.APIError as erreur:
+        raise ServiceIndisponible(f"Cas général : erreur de l'API. Type d'erreur : {erreur}")
+        # raise ServiceIndisponible(
+        #     f"Service d'IA indisponible : {erreur}. "
+        #     "Vérifie la clé, l'adresse et le réseau, puis réessaie."
+        # )
 
 
 def verifier_acces(client, modele):
