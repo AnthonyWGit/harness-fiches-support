@@ -65,7 +65,27 @@ def lancer(verifier=False):
             console.print(f"[red]Erreur : {erreur}[/red]")
             continue
         # À faire (étape 3) : /joindre <fiche.md> <question> joint la fiche à la question.
-        # reponse = conversation.poser(
-        #     question, messages, service, configuration["modele"], limites, confirmer, signaler
-        # )
+        # Split() coupe sur les espaces 
+        parties = saisie.split(maxsplit=2) # /joindre plus nom-de-fiche
+        if parties[0] == "/joindre": 
+            if len(parties) < 3:
+                signaler("Usage : /joindre <fiche.md> <question>")
+                continue
+            nom_fiche = parties[1]
+            question_utilisateur = parties[2]
+            try:
+                question = conversation.joindre_fiche(nom_fiche, question_utilisateur, limites)
+            except outils.AccesRefuse as erreur:
+                signaler(str(erreur))
+                continue
+        signaler("Le service réfléchit…")
+        #try/catch pour ne pas que l'app plante
+        #Utile pour helpdesk pour avoir de soucis pendant intervention
+        try:
+            reponse = conversation.poser(
+                question, messages, service, configuration["modele"], limites, confirmer, signaler
+            )
+        except client.ServiceIndisponible as erreur:
+            console.print(f"[red]Erreur : {erreur}[/red]")
+            continue
         console.print(Markdown(reponse))
