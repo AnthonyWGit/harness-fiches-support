@@ -27,19 +27,21 @@ def joindre_fiche(nom, question, limites):
 
 def poser(question, messages, service, modele, limites, confirmer, signaler):
     """Ajoute la question aux messages, envoie la conversation et garde l'historique.
-
     confirmer et signaler seront utilisés aux étapes 3 et 4.
     """
+    # Mémoriser la taille avant d'ajouter la question.
+    taille_avant = len(messages)
     messages.append({"role": "user", "content": question})
-
     while True:
         try:
             reponse = client.envoyer(service, modele, messages, outils=outils.DEFINITIONS)
         except client.ServiceIndisponible:
-            # On retire la question pour garder un historique cohérent, puis on propage.
+            # On retire tout ce qui a été ajouté pendant ce tour pour garder
+            # un historique cohérent, puis on propage.
             # En d'autres mots : nettoyer l'historique pour qu'il reste cohérent puis on laisse
             # l'interface gérer l'affichage de l'erreur
-            messages.pop()
+            while len(messages) > taille_avant:
+                messages.pop()
             # Un raise tout seul DANS UN EXCEPT relance exactement l'erreur en cours de traitement
             # avec type/message/traces d'exec. intact
             # Un raise seul conserve le tout : on ne pert pas les messages ni les traces
