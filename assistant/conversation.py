@@ -23,7 +23,7 @@ def joindre_fiche(nom, question, limites):
     """Renvoie la question suivie du contenu de la fiche jointe, ou lève AccesRefuse."""
     # À faire (étape 3).
     reponse = outils.lire_fiche(nom,limites)
-    return f"{question} ____ {reponse}"
+    return f"Question : {question} \n_____________________\n Réponse: {reponse}"
 
 def poser(question, messages, service, modele, limites, confirmer, signaler):
     """Ajoute la question aux messages, envoie la conversation et garde l'historique.
