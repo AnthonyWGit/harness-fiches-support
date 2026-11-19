@@ -70,7 +70,21 @@ def lire_fiche(nom, limites):
 def ecrire_fiche(nom, contenu, limites, confirmer):
     """Enregistre la fiche ; confirmer(nom) décide d’un écrasement. Lève AccesRefuse sinon."""
     # À faire (étape 4) : contrôler le chemin et la taille, demander confirmation avant d’écraser.
-    raise NotImplementedError("Étape 4 : ecrire_fiche")
+    chemin = chemin_autorise(nom,limites)
+    taille_contenu = len(contenu.encode("utf-8"))
+    # Passage en octets : 1ko = 1024 octets 
+    taille_max = limites["taille_max_ko"] * 1024
+    if taille_contenu > taille_max:
+        raise AccesRefuse("Fichier trop lourd")
+    if chemin.exists():
+        if not confirmer(nom):
+            raise AccesRefuse("Confirmation fausse")
+    try:
+        with open(chemin, "w", encoding="utf-8") as fiche:
+            fiche.write(contenu)
+            return f"Nouvelle fiche crée."
+    except OSError as e:
+        raise AccesRefuse("Erreur dans l'écriture du fichier")
 
 
 def executer(appel, limites, confirmer = None):
