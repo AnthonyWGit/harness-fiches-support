@@ -57,6 +57,8 @@ def lire_fiche(nom, limites):
     chemin = chemin_autorise(nom,limites)
     # Passage en octets : 1ko = 1024 octets 
     taille_max = limites["taille_max_ko"] * 1024
+    if not chemin.is_file();
+        raise AccesRefuse("Le fichier n'existe pas")
     if chemin.stat().st_size > taille_max:
         raise AccesRefuse("Fichier trop lourd")
     try:    
