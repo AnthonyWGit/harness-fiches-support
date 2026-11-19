@@ -73,7 +73,7 @@ def ecrire_fiche(nom, contenu, limites, confirmer):
     raise NotImplementedError("Étape 4 : ecrire_fiche")
 
 
-def executer(appel, limites):
+def executer(appel, limites, confirmer = None):
     """Exécute un appel d’outil du modèle et renvoie le texte de son résultat, ou lève AccesRefuse."""
     #Renvoie un dicto qui contient des arguments
     try:
