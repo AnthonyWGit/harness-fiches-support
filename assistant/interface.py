@@ -3,7 +3,6 @@
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.prompt import Prompt
-
 from assistant import client, conversation, outils
 from assistant.configuration import ConfigurationInvalide, charger_configuration, charger_limites
 
@@ -17,7 +16,14 @@ console = Console()
 def confirmer(nom):
     """Demande à l’utilisateur s’il accepte d’écraser la fiche."""
     # À faire (étape 4).
-    raise NotImplementedError("Étape 4 : confirmer")
+    signaler("Ecraser la fiche ? [y] [n]")
+    user_input = input()
+    if user_input == "y":
+        return True
+    elif user_input == "n":
+        return False
+    else:
+        raise outils.AccesRefuse("Mauvaise commande : répondre par y ou n")
 
 
 def signaler(texte):
