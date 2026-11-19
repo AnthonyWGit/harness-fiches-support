@@ -71,5 +71,8 @@ def poser(question, messages, service, modele, limites, confirmer, signaler):
             # On reboucle pour envoyer les résultats au modèle.
             continue
         # À faire (étape 4) : gérer les limites (appels d'outil - fait, taille de conversation -fait, en haut).
+        if getattr(reponse, "usage", None) and reponse.usage.total_tokens > limites["conversation_max_jetons"]:
+            signaler("Conversation trop longue : elle repart de zéro.")
+            messages[:] = nouvelle_conversation(limites)
         messages.append({"role": "assistant", "content": message.content})
         return message.content
