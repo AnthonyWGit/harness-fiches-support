@@ -50,6 +50,10 @@ def poser(question, messages, service, modele, limites, confirmer, signaler):
         message = reponse.choices[0].message
         # À faire (étape 3) : si message.tool_calls, exécuter les outils jusqu'à la réponse finale.
         if getattr(message, "tool_calls", None):
+            if nombre_outils + len(message.tool_calls) > limites["appels_outil_max"] :
+                msg = "Nomber max d'appels d'outils pour cette question"
+                messages.append({"role": "assistant", "content": msg})
+                return f"Nombre maximal d'outils utilisés atteints"
             messages.append(message.model_dump(exclude_none=True))
             for appel in message.tool_calls:
                 nombre_outils += 1
@@ -65,14 +69,7 @@ def poser(question, messages, service, modele, limites, confirmer, signaler):
                     "content": resultat,
                 })
             # On reboucle pour envoyer les résultats au modèle.
-            if nombre_outils >= limites["appels_outil_max"] :
-                messages.append({
-                                    "role": "assistant",
-                                    "content": "Nombre maximal d’outils atteint pour cette question.",
-                                })              
-            return f"Nombre maximal d'outils utilisés atteints"
-        continue
-
+            continue
         # À faire (étape 4) : gérer les limites (appels d'outil, taille de conversation).
         messages.append({"role": "assistant", "content": message.content})
         return message.content
