@@ -63,7 +63,7 @@ def lancer(verifier=False):
         # Split() coupe sur les espaces
         parties = saisie.split(maxsplit=2)  # /joindre plus nom-de-fiche
         if parties and parties[0] == "/joindre":
-            if len(parties) < 3:
+            if len(parties) < 3: #Si plus que 2 on a un pb de formatage de commande
                 signaler("Usage : /joindre <fiche.md> <question>")
                 continue
             nom_fiche = parties[1]
