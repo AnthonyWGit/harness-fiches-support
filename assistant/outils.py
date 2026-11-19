@@ -121,6 +121,14 @@ def executer(appel, limites, confirmer = None):
             raise AccesRefuse("Argument 'nom' manquant pour lire fiche")
         return lire_fiche(nom_fiche, limites)
     if nom_outil == "ecrire_fiche":
-        raise AccesRefuse("Écriture non implémentée (étape 4).")
+        nom_fichier = arguments.get("nom")
+        contenu = arguments.get("contenu")
+        if not isinstance(nom_fichier, str) or not nom_fichier.strip():
+            raise AccesRefuse("Argument 'nom' manquant pour ecrire_fiche.")
+        if not isinstance(contenu, str):
+            raise AccesRefuse("Argument 'contenu' manquant pour ecrire_fiche.")
+        if confirmer is None:
+            raise AccesRefuse("Confirmation impossible : pas de fonction confirmer.")
+        return ecrire_fiche(nom_fichier, contenu, limites, confirmer)
     #Cas où il n'y a pas d'outils correspondant
     raise AccesRefuse(f"Outil inconnu : {nom_outil}")
