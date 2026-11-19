@@ -30,7 +30,7 @@ def lister_fiches(limites):
     return sorted(chemin.name for chemin in Path(limites["dossier_fiches"]).glob("*" + limites["extension"]))
 
 
-def chemin_autorise(nom, limites):
+def chemin_autorise(nom, limites): #Ici nom = nom du fichier
     """Renvoie le chemin de la fiche si elle reste dans le dossier des fiches, sinon lève AccesRefuse."""
     if not isinstance(nom, str) or not nom.strip():
         raise AccesRefuse("Nom de fiche invalide.")
