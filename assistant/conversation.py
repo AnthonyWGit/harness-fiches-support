@@ -70,6 +70,6 @@ def poser(question, messages, service, modele, limites, confirmer, signaler):
                 })
             # On reboucle pour envoyer les résultats au modèle.
             continue
-        # À faire (étape 4) : gérer les limites (appels d'outil, taille de conversation).
+        # À faire (étape 4) : gérer les limites (appels d'outil - fait, taille de conversation -fait, en haut).
         messages.append({"role": "assistant", "content": message.content})
         return message.content

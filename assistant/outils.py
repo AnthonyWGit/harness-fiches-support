@@ -16,7 +16,21 @@ DEFINITIONS = [
             },
         },
     },
-    # À faire (étape 4) : décrire l’outil ecrire_fiche.
+    {
+        "type": "function",
+        "function": {
+            "name": "ecrire_fiche",
+            "description": "Crée ou écrase une fiche de procédure (Markdown) dans le dossier des fiches.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "nom": {"type": "string", "description": "Nom du fichier, par exemple suspendre-compte.md"},
+                    "contenu": {"type": "string", "description": "Contenu Markdown de la fiche"},
+                },
+                "required": ["nom", "contenu"],
+            },
+        },
+    },
 ]
 
 
