@@ -16,7 +16,6 @@ console = Console()
 
 def confirmer(nom):
     """Demande à l’utilisateur s’il accepte d’écraser la fiche."""
-    # À faire (étape 4).
     return Confirm.ask(f"Écraser la fiche {nom} ?", default=False)
 
 
@@ -67,7 +66,6 @@ def lancer(verifier=False):
             except outils.AccesRefuse as erreur:
                 signaler(str(erreur))
                 continue
-        # À faire (étape 2) : afficher les erreurs du service sans quitter.
         signaler("Le service réfléchit…")
         # try/catch pour ne pas que l'app plante
         # Utile pour helpdesk pour avoir de soucis pendant intervention

@@ -48,7 +48,6 @@ def poser(question, messages, service, modele, limites, confirmer, signaler):
             # Un raise seul conserve le tout : on ne pert pas les messages ni les traces
             raise
         message = reponse.choices[0].message
-        # À faire (étape 3) : si message.tool_calls, exécuter les outils jusqu'à la réponse finale.
         if getattr(message, "tool_calls", None):
             if nombre_outils + len(message.tool_calls) > limites["appels_outil_max"] :
                 msg = "Nomber max d'appels d'outils pour cette question"
@@ -70,7 +69,6 @@ def poser(question, messages, service, modele, limites, confirmer, signaler):
                 })
             # On reboucle pour envoyer les résultats au modèle.
             continue
-        # À faire (étape 4) : gérer les limites (appels d'outil - fait, taille de conversation -fait, en haut).
         if getattr(reponse, "usage", None) and reponse.usage.total_tokens > limites["conversation_max_jetons"]:
             signaler("Conversation trop longue : elle repart de zéro.")
             messages[:] = nouvelle_conversation(limites)
