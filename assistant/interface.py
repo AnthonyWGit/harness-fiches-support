@@ -5,6 +5,7 @@ from rich.markdown import Markdown
 from rich.prompt import Prompt
 from assistant import client, conversation, outils
 from assistant.configuration import ConfigurationInvalide, charger_configuration, charger_limites
+from rich.prompt import Confirm
 
 AIDE = """Pose ta question, puis valide avec Entrée.
 /joindre <fiche.md> <question> : joindre une fiche à ta question
@@ -16,14 +17,7 @@ console = Console()
 def confirmer(nom):
     """Demande à l’utilisateur s’il accepte d’écraser la fiche."""
     # À faire (étape 4).
-    signaler("Ecraser la fiche ? [y] [n]")
-    user_input = input()
-    if user_input == "y":
-        return True
-    elif user_input == "n":
-        return False
-    else:
-        raise outils.AccesRefuse("Mauvaise commande : répondre par y ou n")
+    return Confirm.ask(f"Écraser la fiche {nom} ?", default=False)
 
 
 def signaler(texte):
