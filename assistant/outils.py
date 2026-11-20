@@ -67,7 +67,6 @@ def chemin_autorise(nom, limites): #Ici nom = nom du fichier
 
 def lire_fiche(nom, limites):
     """Renvoie le contenu de la fiche, ou lève AccesRefuse."""
-    # À faire (étape 3) : contrôler le chemin et la taille, puis lire la fiche.
     chemin = chemin_autorise(nom,limites)
     # Passage en octets : 1ko = 1024 octets 
     taille_max = limites["taille_max_ko"] * 1024
