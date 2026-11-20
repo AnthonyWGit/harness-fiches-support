@@ -21,7 +21,6 @@ def nouvelle_conversation(limites):
 
 def joindre_fiche(nom, question, limites):
     """Renvoie la question suivie du contenu de la fiche jointe, ou lève AccesRefuse."""
-    # À faire (étape 3).
     reponse = outils.lire_fiche(nom,limites)
     return f"Question : {question} \n_____________________\n Réponse: {reponse}"
 
